@@ -1,0 +1,183 @@
+/* Modern Cricket Game UI Styles */
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --accent-color: #e74c3c;
+    --background-color: #ecf0f1;
+    --text-color: #2c3e50;
+}
+
+body {
+    background: var(--background-color);
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-color);
+}
+
+.game-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.game-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.score-board {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.team-score {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.team-score:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.timer-container {
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.hit-button {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.hit-button:hover:not(.disabled) {
+    background: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+}
+
+.hit-button.disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
+}
+
+.score-table {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.score-table table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.score-table th:first-child {
+    width: 20%;
+}
+
+.score-table th:not(:first-child):not(:last-child) {
+    width: 8%;
+}
+
+.score-table th:last-child {
+    width: 20%;
+}
+
+.score-table th, .score-table td {
+    padding: 1rem;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.score-table thead {
+    background: var(--primary-color);
+    color: white;
+}
+
+.score-table tbody tr:hover {
+    background: #f7f9fc;
+}
+
+.result-container {
+    background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+    color: white;
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    margin-top: 2rem;
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.score-value {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.player-score {
+    transition: all 0.3s ease;
+}
+
+.player-score.highlight {
+    background: #f1c40f;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .game-container {
+        padding: 1rem;
+    }
+    
+    .score-board {
+        padding: 1rem;
+    }
+    
+    .timer-container {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .score-table {
+        font-size: 0.9rem;
+    }
+} 

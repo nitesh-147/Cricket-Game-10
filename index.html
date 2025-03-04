@@ -4,15 +4,96 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cricket Game</title>
-    <link
-      rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="styles.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
   </head>
   <body>
+    <div class="game-container">
+      <div class="game-header text-center">
+        <h1 class="display-4 mb-0">CRICKET10</h1>
+        <p class="lead mt-2">An exciting cricket game experience!</p>
+      </div>
+
+      <div class="score-board">
+        <div class="row align-items-center">
+          <div class="col-md-4">
+            <div class="team-score text-center">
+              <h5 class="mb-3">Team 1 Score</h5>
+              <div class="score-value mb-3" id="score1">0</div>
+              <button class="hit-button" id="hit1">HIT 1</button>
+            </div>
+          </div>
+          
+          <div class="col-md-4">
+            <div class="text-center">
+              <h5 class="mb-3">TIMER</h5>
+              <div class="timer-container">
+                <h2 class="mb-0" id="timer">60</h2>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-4">
+            <div class="team-score text-center">
+              <h5 class="mb-3">Team 2 Score</h5>
+              <div class="score-value mb-3" id="score2">0</div>
+              <button class="hit-button disabled" id="hit2">HIT 2</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-5">
+          <div class="score-table">
+            <table class="table table-bordered mb-0" id="table1">
+              <thead>
+                <tr>
+                  <th>Team 1</th>
+                  <th>B1</th>
+                  <th>B2</th>
+                  <th>B3</th>
+                  <th>B4</th>
+                  <th>B5</th>
+                  <th>B6</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        
+        <div class="col-md-2"></div>
+        
+        <div class="col-md-5">
+          <div class="score-table">
+            <table class="table table-bordered mb-0" id="table2">
+              <thead>
+                <tr>
+                  <th>Team 2</th>
+                  <th>B1</th>
+                  <th>B2</th>
+                  <th>B3</th>
+                  <th>B4</th>
+                  <th>B5</th>
+                  <th>B6</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="result"></div>
+    </div>
+
     <script src="script.js"></script>
   </body>
 </html>
