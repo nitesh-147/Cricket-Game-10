@@ -172,11 +172,14 @@ class GameUI {
     static toggleTeamButton(team: number, enable: boolean): void {
         const button = DOMHelper.getElement<HTMLButtonElement>(`hit${team}`);
         button.className = `hit-button${!enable ? ' disabled' : ''}`;
+        button.disabled = !enable;
     }
 
     static showGameResult(winner: number, resultText: string, mom: { player: number; score: number }): void {
-        if (document.getElementById('result')) {
-            return;
+        // Remove any existing result container
+        const existingResult = document.getElementById('result');
+        if (existingResult) {
+            existingResult.remove();
         }
 
         const resultContainer = DOMHelper.createElement('div', {
@@ -189,19 +192,58 @@ class GameUI {
         }, resultText);
         
         const momText = DOMHelper.createElement('p', {
-            class: 'mb-0'
+            class: 'mb-3'
         }, `Player of the Match: Player${mom.player} from Team${winner} (Score: ${mom.score})`);
+
+        const restartButton = DOMHelper.createElement('button', {
+            class: 'hit-button',
+            id: 'restart-btn'
+        }, 'Restart Game');
         
         resultContainer.appendChild(winnerText);
         resultContainer.appendChild(momText);
-        document.querySelector('.game-container')?.appendChild(resultContainer);
+        resultContainer.appendChild(restartButton);
+        
+        const gameContainer = document.querySelector('.game-container');
+        if (gameContainer) {
+            gameContainer.appendChild(resultContainer);
+        }
 
-        this.toggleTeamButton(1, false);
+        // Add event listener to restart button
+        restartButton.addEventListener('click', () => {
+            CricketGame.getInstance()?.restartGame();
+        });
+    }
+
+    static resetUI(): void {
+        // Reset score displays
+        this.updateScore(1, 0);
+        this.updateScore(2, 0);
+
+        // Reset timer
+        this.updateTimer(GAME_CONFIG.TIMER_DURATION);
+        DOMHelper.getElement<HTMLElement>('timer').style.color = '';
+
+        // Reset buttons
+        this.toggleTeamButton(1, true);
         this.toggleTeamButton(2, false);
 
-        const game = CricketGame.getInstance();
-        if (game) {
-            game.clearTimer();
+        // Clear all cells
+        for (let team = 1; team <= 2; team++) {
+            for (let player = 1; player <= GAME_CONFIG.PLAYERS_PER_TEAM; player++) {
+                // Clear player total
+                this.updateCell(`t${team}${player}`, '');
+                // Clear each ball
+                for (let ball = 1; ball <= GAME_CONFIG.BALLS_PER_PLAYER; ball++) {
+                    this.updateCell(`${team}${player}${ball}`, '');
+                }
+            }
+        }
+
+        // Remove result container if exists
+        const resultContainer = document.getElementById('result');
+        if (resultContainer) {
+            resultContainer.remove();
         }
     }
 }
@@ -227,8 +269,16 @@ class CricketGame {
         const hitBtn1 = DOMHelper.getElement<HTMLButtonElement>('hit1');
         const hitBtn2 = DOMHelper.getElement<HTMLButtonElement>('hit2');
         
-        hitBtn1.addEventListener('click', () => this.handleHit());
-        hitBtn2.addEventListener('click', () => this.handleHit());
+        hitBtn1.addEventListener('click', () => {
+            if (!hitBtn1.classList.contains('disabled')) {
+                this.handleHit();
+            }
+        });
+        hitBtn2.addEventListener('click', () => {
+            if (!hitBtn2.classList.contains('disabled')) {
+                this.handleHit();
+            }
+        });
     }
 
     private handleHit(): void {
@@ -303,7 +353,15 @@ class CricketGame {
             });
         }
         
-        if (state.players > GAME_CONFIG.PLAYERS_PER_TEAM) {
+        // Check if team 2's innings is complete (all balls played)
+        if (state.team === 2 && state.players > GAME_CONFIG.PLAYERS_PER_TEAM) {
+            this.showResult();
+            return;
+        }
+        
+        // Check if team 1's innings is complete
+        if (state.team === 1 && state.players > GAME_CONFIG.PLAYERS_PER_TEAM) {
+            GameUI.toggleTeamButton(1, false);
             this.switchTeam();
             return;
         }
@@ -313,6 +371,7 @@ class CricketGame {
             const score1 = parseInt(DOMHelper.getElement<HTMLElement>('score1').textContent || '0');
             if (state.teamTotal > score1) {
                 this.showResult();
+                return;
             }
         }
     }
@@ -325,13 +384,9 @@ class CricketGame {
         
         if (state.team === 1) {
             this.stateManager.nextTeam();
+            GameUI.toggleTeamButton(1, false);
             GameUI.toggleTeamButton(2, true);
-            // Clear timer when switching to team 2
-            const interval = this.stateManager.getTimerInterval();
-            if (interval) {
-                clearInterval(interval);
-                this.stateManager.setTimerInterval(null);
-            }
+            // Don't clear timer for team 2, let it start when they begin
         } else if (!this.gameEnded) {
             this.showResult();
         }
@@ -359,7 +414,14 @@ class CricketGame {
             resultText = `Team ${winner} wins by ${remainingWickets} wickets!`;
         }
         
-        GameUI.showGameResult(winner, resultText, mom);
+        // Ensure both buttons are disabled
+        GameUI.toggleTeamButton(1, false);
+        GameUI.toggleTeamButton(2, false);
+
+        // Add a small delay to ensure DOM updates are complete
+        setTimeout(() => {
+            GameUI.showGameResult(winner, resultText, mom);
+        }, 100);
     }
 
     private findPlayerOfTheMatch(winner: number): { player: number; score: number } {
@@ -367,7 +429,7 @@ class CricketGame {
         let player = -1;
         
         for (let i = 1; i <= GAME_CONFIG.PLAYERS_PER_TEAM; i++) {
-            const score = parseInt(DOMHelper.getElement<HTMLElement>(`t${winner}${i}`).innerText);
+            const score = parseInt(DOMHelper.getElement<HTMLElement>(`t${winner}${i}`).textContent || '0');
             if (score >= maxScore) {
                 maxScore = score;
                 player = i;
@@ -410,6 +472,18 @@ class CricketGame {
             clearInterval(interval);
             this.stateManager.setTimerInterval(null);
         }
+    }
+
+    restartGame(): void {
+        // Reset game state
+        this.gameEnded = false;
+        this.clearTimer();
+        
+        // Reset state manager
+        this.stateManager = new GameStateManager();
+        
+        // Reset UI
+        GameUI.resetUI();
     }
 }
 

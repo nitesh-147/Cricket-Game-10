@@ -183,6 +183,25 @@ body {
     font-weight: 600;
 }
 
+#restart-btn {
+    background: white;
+    color: var(--accent-color);
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 1rem;
+}
+
+#restart-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.3);
+    background: #f8f9fa;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .game-container {
