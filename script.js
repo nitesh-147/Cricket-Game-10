@@ -37,7 +37,8 @@ class GameStateManager {
             total: 0,
             teamTotal: 0,
             team: 1,
-            tInterval: null
+            tInterval: null,
+            wickets: 0
         };
     }
     getState() {
@@ -51,7 +52,8 @@ class GameStateManager {
             players: 1,
             balls: 1,
             total: 0,
-            teamTotal: 0
+            teamTotal: 0,
+            wickets: 0
         });
     }
     nextTeam() {
@@ -60,7 +62,8 @@ class GameStateManager {
             players: 1,
             balls: 1,
             total: 0,
-            teamTotal: 0
+            teamTotal: 0,
+            wickets: 0
         });
     }
     setTimerInterval(interval) {
@@ -75,6 +78,8 @@ class GameUI {
     static initialize() {
         // Initialize event listeners and any dynamic content
         this.initializeScoreTables();
+        // Initialize timer with config value
+        this.updateTimer(GAME_CONFIG.TIMER_DURATION);
     }
     static initializeScoreTables() {
         // Initialize the score tables with empty rows
@@ -108,9 +113,9 @@ class GameUI {
         cell.classList.add('highlight');
         setTimeout(() => cell.classList.remove('highlight'), 500);
     }
-    static updateScore(team, score) {
+    static updateScore(team, score, wickets) {
         const scoreElement = DOMHelper.getElement(`score${team}`);
-        scoreElement.textContent = score.toString().replace(/\./g, '');
+        scoreElement.textContent = `${score.toString().replace(/\./g, '')}/${wickets}`;
         scoreElement.classList.add('highlight');
         setTimeout(() => scoreElement.classList.remove('highlight'), 500);
     }
@@ -161,8 +166,8 @@ class GameUI {
     }
     static resetUI() {
         // Reset score displays
-        this.updateScore(1, 0);
-        this.updateScore(2, 0);
+        this.updateScore(1, 0, 0);
+        this.updateScore(2, 0, 0);
         // Reset timer
         this.updateTimer(GAME_CONFIG.TIMER_DURATION);
         DOMHelper.getElement('timer').style.color = '';
@@ -227,15 +232,21 @@ class CricketGame {
         return Math.floor(Math.random() * 7);
     }
     updateScore(run, cellId) {
+        var _a;
         const state = this.stateManager.getState();
         if (run === 0) {
             GameUI.updateCell(cellId, 'W');
             GameUI.updateCell(`t${state.team}${state.players}`, state.total.toString());
+            // Update state with new wicket
+            const newWickets = state.wickets + 1;
             this.stateManager.updateState({
                 total: 0,
                 players: state.players + 1,
-                balls: 1
+                balls: 1,
+                wickets: newWickets
             });
+            // Update score display with wickets
+            GameUI.updateScore(state.team, state.teamTotal, newWickets);
             // Check if all players of team 2 are out or last player finished
             if (state.team === 2 &&
                 (state.players >= GAME_CONFIG.PLAYERS_PER_TEAM ||
@@ -249,15 +260,28 @@ class CricketGame {
             const newTeamTotal = state.teamTotal + run;
             GameUI.updateCell(cellId, run.toString());
             GameUI.updateCell(`t${state.team}${state.players}`, newTotal.toString());
-            GameUI.updateScore(state.team, newTeamTotal);
+            GameUI.updateScore(state.team, newTeamTotal, state.wickets);
             this.stateManager.updateState({
                 total: newTotal,
                 teamTotal: newTeamTotal,
                 balls: state.balls + 1
             });
+            // Check if player has completed their 6 balls
+            if (state.balls === GAME_CONFIG.BALLS_PER_PLAYER) {
+                // Move to next player and count wicket
+                const newWickets = state.wickets + 1;
+                this.stateManager.updateState({
+                    players: state.players + 1,
+                    balls: 1,
+                    total: 0,
+                    wickets: newWickets
+                });
+                // Update score display with new wicket count
+                GameUI.updateScore(state.team, newTeamTotal, newWickets);
+            }
             // Check if team 2 has won by exceeding team 1's score
             if (state.team === 2) {
-                const score1 = parseInt(DOMHelper.getElement('score1').textContent || '0');
+                const score1 = parseInt(((_a = DOMHelper.getElement('score1').textContent) === null || _a === void 0 ? void 0 : _a.split('/')[0]) || '0');
                 if (newTeamTotal > score1) {
                     this.showResult();
                     return;
@@ -266,9 +290,11 @@ class CricketGame {
         }
     }
     checkInningsProgress() {
+        var _a;
         const state = this.stateManager.getState();
         // Check if current player has completed their balls
         if (state.balls === 7) {
+            // Move to next player without counting wicket (wicket already counted in updateScore)
             this.stateManager.updateState({
                 players: state.players + 1,
                 balls: 1,
@@ -292,7 +318,7 @@ class CricketGame {
         }
         // Check if team 2 has won by exceeding team 1's score
         if (state.team === 2) {
-            const score1 = parseInt(DOMHelper.getElement('score1').textContent || '0');
+            const score1 = parseInt(((_a = DOMHelper.getElement('score1').textContent) === null || _a === void 0 ? void 0 : _a.split('/')[0]) || '0');
             if (state.teamTotal > score1) {
                 this.showResult();
                 return;
@@ -314,12 +340,13 @@ class CricketGame {
         }
     }
     showResult() {
+        var _a, _b;
         if (this.gameEnded)
             return;
         this.gameEnded = true;
         this.clearTimer(); // Clear any existing timer
-        const score1 = parseInt(DOMHelper.getElement('score1').textContent || '0');
-        const score2 = parseInt(DOMHelper.getElement('score2').textContent || '0');
+        const score1 = parseInt(((_a = DOMHelper.getElement('score1').textContent) === null || _a === void 0 ? void 0 : _a.split('/')[0]) || '0');
+        const score2 = parseInt(((_b = DOMHelper.getElement('score2').textContent) === null || _b === void 0 ? void 0 : _b.split('/')[0]) || '0');
         const winner = score2 > score1 ? 2 : 1;
         const margin = Math.abs(score1 - score2);
         const mom = this.findPlayerOfTheMatch(winner);
@@ -329,7 +356,7 @@ class CricketGame {
         }
         else {
             const state = this.stateManager.getState();
-            const remainingWickets = GAME_CONFIG.PLAYERS_PER_TEAM - (state.players - 1);
+            const remainingWickets = GAME_CONFIG.PLAYERS_PER_TEAM - state.wickets;
             resultText = `Team ${winner} wins by ${remainingWickets} wickets!`;
         }
         // Ensure both buttons are disabled

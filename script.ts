@@ -57,6 +57,7 @@ interface GameState {
     teamTotal: number;
     team: number;
     tInterval: number | null;
+    wickets: number;
 }
 
 class GameStateManager {
@@ -69,7 +70,8 @@ class GameStateManager {
             total: 0,
             teamTotal: 0,
             team: 1,
-            tInterval: null
+            tInterval: null,
+            wickets: 0
         };
     }
 
@@ -86,7 +88,8 @@ class GameStateManager {
             players: 1,
             balls: 1,
             total: 0,
-            teamTotal: 0
+            teamTotal: 0,
+            wickets: 0
         });
     }
 
@@ -96,7 +99,8 @@ class GameStateManager {
             players: 1,
             balls: 1,
             total: 0,
-            teamTotal: 0
+            teamTotal: 0,
+            wickets: 0
         });
     }
 
@@ -114,6 +118,8 @@ class GameUI {
     static initialize(): void {
         // Initialize event listeners and any dynamic content
         this.initializeScoreTables();
+        // Initialize timer with config value
+        this.updateTimer(GAME_CONFIG.TIMER_DURATION);
     }
 
     private static initializeScoreTables(): void {
@@ -154,9 +160,9 @@ class GameUI {
         setTimeout(() => cell.classList.remove('highlight'), 500);
     }
 
-    static updateScore(team: number, score: number): void {
+    static updateScore(team: number, score: number, wickets: number): void {
         const scoreElement = DOMHelper.getElement<HTMLElement>(`score${team}`);
-        scoreElement.textContent = score.toString().replace(/\./g, '');
+        scoreElement.textContent = `${score.toString().replace(/\./g, '')}/${wickets}`;
         scoreElement.classList.add('highlight');
         setTimeout(() => scoreElement.classList.remove('highlight'), 500);
     }
@@ -217,8 +223,8 @@ class GameUI {
 
     static resetUI(): void {
         // Reset score displays
-        this.updateScore(1, 0);
-        this.updateScore(2, 0);
+        this.updateScore(1, 0, 0);
+        this.updateScore(2, 0, 0);
 
         // Reset timer
         this.updateTimer(GAME_CONFIG.TIMER_DURATION);
@@ -306,11 +312,17 @@ class CricketGame {
             GameUI.updateCell(cellId, 'W');
             GameUI.updateCell(`t${state.team}${state.players}`, state.total.toString());
 
+            // Update state with new wicket
+            const newWickets = state.wickets + 1;
             this.stateManager.updateState({
                 total: 0,
                 players: state.players + 1,
-                balls: 1
+                balls: 1,
+                wickets: newWickets
             });
+
+            // Update score display with wickets
+            GameUI.updateScore(state.team, state.teamTotal, newWickets);
 
             // Check if all players of team 2 are out or last player finished
             if (state.team === 2 &&
@@ -325,7 +337,7 @@ class CricketGame {
 
             GameUI.updateCell(cellId, run.toString());
             GameUI.updateCell(`t${state.team}${state.players}`, newTotal.toString());
-            GameUI.updateScore(state.team, newTeamTotal);
+            GameUI.updateScore(state.team, newTeamTotal, state.wickets);
 
             this.stateManager.updateState({
                 total: newTotal,
@@ -333,9 +345,23 @@ class CricketGame {
                 balls: state.balls + 1
             });
 
+            // Check if player has completed their 6 balls
+            if (state.balls === GAME_CONFIG.BALLS_PER_PLAYER) {
+                // Move to next player and count wicket
+                const newWickets = state.wickets + 1;
+                this.stateManager.updateState({
+                    players: state.players + 1,
+                    balls: 1,
+                    total: 0,
+                    wickets: newWickets
+                });
+                // Update score display with new wicket count
+                GameUI.updateScore(state.team, newTeamTotal, newWickets);
+            }
+
             // Check if team 2 has won by exceeding team 1's score
             if (state.team === 2) {
-                const score1 = parseInt(DOMHelper.getElement<HTMLElement>('score1').textContent || '0');
+                const score1 = parseInt(DOMHelper.getElement<HTMLElement>('score1').textContent?.split('/')[0] || '0');
                 if (newTeamTotal > score1) {
                     this.showResult();
                     return;
@@ -349,6 +375,7 @@ class CricketGame {
 
         // Check if current player has completed their balls
         if (state.balls === 7) {
+            // Move to next player without counting wicket (wicket already counted in updateScore)
             this.stateManager.updateState({
                 players: state.players + 1,
                 balls: 1,
@@ -375,7 +402,7 @@ class CricketGame {
 
         // Check if team 2 has won by exceeding team 1's score
         if (state.team === 2) {
-            const score1 = parseInt(DOMHelper.getElement<HTMLElement>('score1').textContent || '0');
+            const score1 = parseInt(DOMHelper.getElement<HTMLElement>('score1').textContent?.split('/')[0] || '0');
             if (state.teamTotal > score1) {
                 this.showResult();
                 return;
@@ -405,8 +432,8 @@ class CricketGame {
         this.gameEnded = true;
         this.clearTimer();  // Clear any existing timer
 
-        const score1 = parseInt(DOMHelper.getElement<HTMLElement>('score1').textContent || '0');
-        const score2 = parseInt(DOMHelper.getElement<HTMLElement>('score2').textContent || '0');
+        const score1 = parseInt(DOMHelper.getElement<HTMLElement>('score1').textContent?.split('/')[0] || '0');
+        const score2 = parseInt(DOMHelper.getElement<HTMLElement>('score2').textContent?.split('/')[0] || '0');
 
         const winner = score2 > score1 ? 2 : 1;
         const margin = Math.abs(score1 - score2);
@@ -417,7 +444,7 @@ class CricketGame {
             resultText = `Team ${winner} wins by ${margin} runs!`;
         } else {
             const state = this.stateManager.getState();
-            const remainingWickets = GAME_CONFIG.PLAYERS_PER_TEAM - (state.players - 1);
+            const remainingWickets = GAME_CONFIG.PLAYERS_PER_TEAM - state.wickets;
             resultText = `Team ${winner} wins by ${remainingWickets} wickets!`;
         }
 
