@@ -9,7 +9,7 @@ interface GameConfig {
 const GAME_CONFIG: GameConfig = {
     PLAYERS_PER_TEAM: 10,
     BALLS_PER_PLAYER: 6,
-    TIMER_DURATION: 60,
+    TIMER_DURATION: 20,
     TEAMS: 2
 };
 
