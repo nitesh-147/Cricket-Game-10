@@ -132,18 +132,18 @@ class GameUI {
     private static createPlayerRow(teamNum: number, playerNum: number): HTMLTableRowElement {
         const row = DOMHelper.createElement('tr');
         row.appendChild(DOMHelper.createElement('th', {}, `Player${playerNum}`));
-        
+
         for (let j = 1; j <= GAME_CONFIG.BALLS_PER_PLAYER; j++) {
             const cell = DOMHelper.createElement('td', {
                 id: `${teamNum}${playerNum}${j}`
             });
             row.appendChild(cell);
         }
-        
+
         row.appendChild(DOMHelper.createElement('td', {
             id: `t${teamNum}${playerNum}`
         }));
-        
+
         return row;
     }
 
@@ -186,11 +186,11 @@ class GameUI {
             class: 'result-container',
             id: 'result'
         });
-        
+
         const winnerText = DOMHelper.createElement('h4', {
             class: 'mb-3'
         }, resultText);
-        
+
         const momText = DOMHelper.createElement('p', {
             class: 'mb-3'
         }, `Player of the Match: Player${mom.player} from Team${winner} (Score: ${mom.score})`);
@@ -199,11 +199,11 @@ class GameUI {
             class: 'hit-button',
             id: 'restart-btn'
         }, 'Restart Game');
-        
+
         resultContainer.appendChild(winnerText);
         resultContainer.appendChild(momText);
         resultContainer.appendChild(restartButton);
-        
+
         const gameContainer = document.querySelector('.game-container');
         if (gameContainer) {
             gameContainer.appendChild(resultContainer);
@@ -268,7 +268,7 @@ class CricketGame {
         // Bind events for both team buttons at initialization
         const hitBtn1 = DOMHelper.getElement<HTMLButtonElement>('hit1');
         const hitBtn2 = DOMHelper.getElement<HTMLButtonElement>('hit2');
-        
+
         hitBtn1.addEventListener('click', () => {
             if (!hitBtn1.classList.contains('disabled')) {
                 this.handleHit();
@@ -283,14 +283,14 @@ class CricketGame {
 
     private handleHit(): void {
         const state = this.stateManager.getState();
-        
+
         if (state.players === 1 && state.balls === 1) {
             this.startTimer();
         }
 
         const run = this.generateRun();
         const cellId = `${state.team}${state.players}${state.balls}`;
-        
+
         this.updateScore(run, cellId);
         this.checkInningsProgress();
     }
@@ -301,30 +301,32 @@ class CricketGame {
 
     private updateScore(run: number, cellId: string): void {
         const state = this.stateManager.getState();
-        
+
         if (run === 0) {
             GameUI.updateCell(cellId, 'W');
             GameUI.updateCell(`t${state.team}${state.players}`, state.total.toString());
-            
+
             this.stateManager.updateState({
                 total: 0,
                 players: state.players + 1,
                 balls: 1
             });
 
-            // Check if all players of team 2 are out
-            if (state.team === 2 && state.players >= GAME_CONFIG.PLAYERS_PER_TEAM) {
+            // Check if all players of team 2 are out or last player finished
+            if (state.team === 2 &&
+                (state.players >= GAME_CONFIG.PLAYERS_PER_TEAM ||
+                    (state.players === GAME_CONFIG.PLAYERS_PER_TEAM && state.balls >= GAME_CONFIG.BALLS_PER_PLAYER))) {
                 this.showResult();
                 return;
             }
         } else {
             const newTotal = state.total + run;
             const newTeamTotal = state.teamTotal + run;
-            
+
             GameUI.updateCell(cellId, run.toString());
             GameUI.updateCell(`t${state.team}${state.players}`, newTotal.toString());
             GameUI.updateScore(state.team, newTeamTotal);
-            
+
             this.stateManager.updateState({
                 total: newTotal,
                 teamTotal: newTeamTotal,
@@ -344,7 +346,7 @@ class CricketGame {
 
     private checkInningsProgress(): void {
         const state = this.stateManager.getState();
-        
+
         // Check if current player has completed their balls
         if (state.balls === 7) {
             this.stateManager.updateState({
@@ -353,18 +355,20 @@ class CricketGame {
                 total: 0
             });
         }
-        
+
         // Check if team 1's innings is complete (all players done or last player finished balls)
-        if (state.team === 1 && 
-            (state.players > GAME_CONFIG.PLAYERS_PER_TEAM || 
-             (state.players === GAME_CONFIG.PLAYERS_PER_TEAM && state.balls > GAME_CONFIG.BALLS_PER_PLAYER))) {
+        if (state.team === 1 &&
+            (state.players > GAME_CONFIG.PLAYERS_PER_TEAM ||
+                (state.players === GAME_CONFIG.PLAYERS_PER_TEAM && state.balls > GAME_CONFIG.BALLS_PER_PLAYER))) {
             GameUI.toggleTeamButton(1, false);
             this.switchTeam();
             return;
         }
-        
-        // Check if team 2's innings is complete
-        if (state.team === 2 && state.players > GAME_CONFIG.PLAYERS_PER_TEAM) {
+
+        // Check if team 2's innings is complete (all players done or last player finished balls)
+        if (state.team === 2 &&
+            (state.players > GAME_CONFIG.PLAYERS_PER_TEAM ||
+                (state.players === GAME_CONFIG.PLAYERS_PER_TEAM && state.balls > GAME_CONFIG.BALLS_PER_PLAYER))) {
             this.showResult();
             return;
         }
@@ -381,10 +385,10 @@ class CricketGame {
 
     private switchTeam(): void {
         const state = this.stateManager.getState();
-        
+
         this.resetTimer();
         GameUI.toggleTeamButton(state.team, false);
-        
+
         if (state.team === 1) {
             this.stateManager.nextTeam();
             GameUI.toggleTeamButton(1, false);
@@ -397,13 +401,13 @@ class CricketGame {
 
     private showResult(): void {
         if (this.gameEnded) return;
-        
+
         this.gameEnded = true;
         this.clearTimer();  // Clear any existing timer
-        
+
         const score1 = parseInt(DOMHelper.getElement<HTMLElement>('score1').textContent || '0');
         const score2 = parseInt(DOMHelper.getElement<HTMLElement>('score2').textContent || '0');
-        
+
         const winner = score2 > score1 ? 2 : 1;
         const margin = Math.abs(score1 - score2);
         const mom = this.findPlayerOfTheMatch(winner);
@@ -416,7 +420,7 @@ class CricketGame {
             const remainingWickets = GAME_CONFIG.PLAYERS_PER_TEAM - (state.players - 1);
             resultText = `Team ${winner} wins by ${remainingWickets} wickets!`;
         }
-        
+
         // Ensure both buttons are disabled
         GameUI.toggleTeamButton(1, false);
         GameUI.toggleTeamButton(2, false);
@@ -430,7 +434,7 @@ class CricketGame {
     private findPlayerOfTheMatch(winner: number): { player: number; score: number } {
         let maxScore = 0;
         let player = -1;
-        
+
         for (let i = 1; i <= GAME_CONFIG.PLAYERS_PER_TEAM; i++) {
             const score = parseInt(DOMHelper.getElement<HTMLElement>(`t${winner}${i}`).textContent || '0');
             if (score >= maxScore) {
@@ -438,7 +442,7 @@ class CricketGame {
                 player = i;
             }
         }
-        
+
         return { player, score: maxScore };
     }
 
@@ -449,12 +453,12 @@ class CricketGame {
 
     private updateTimer(): void {
         if (this.gameEnded) return;
-        
+
         const timerElement = DOMHelper.getElement<HTMLElement>('timer');
         const currentTime = parseInt(timerElement.innerText) - 1;
-        
+
         GameUI.updateTimer(currentTime);
-        
+
         if (currentTime === 0) {
             this.switchTeam();
         }
@@ -481,10 +485,10 @@ class CricketGame {
         // Reset game state
         this.gameEnded = false;
         this.clearTimer();
-        
+
         // Reset state manager
         this.stateManager = new GameStateManager();
-        
+
         // Reset UI
         GameUI.resetUI();
     }

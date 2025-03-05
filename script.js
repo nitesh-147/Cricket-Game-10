@@ -236,8 +236,10 @@ class CricketGame {
                 players: state.players + 1,
                 balls: 1
             });
-            // Check if all players of team 2 are out
-            if (state.team === 2 && state.players >= GAME_CONFIG.PLAYERS_PER_TEAM) {
+            // Check if all players of team 2 are out or last player finished
+            if (state.team === 2 &&
+                (state.players >= GAME_CONFIG.PLAYERS_PER_TEAM ||
+                    (state.players === GAME_CONFIG.PLAYERS_PER_TEAM && state.balls >= GAME_CONFIG.BALLS_PER_PLAYER))) {
                 this.showResult();
                 return;
             }
@@ -281,8 +283,10 @@ class CricketGame {
             this.switchTeam();
             return;
         }
-        // Check if team 2's innings is complete
-        if (state.team === 2 && state.players > GAME_CONFIG.PLAYERS_PER_TEAM) {
+        // Check if team 2's innings is complete (all players done or last player finished balls)
+        if (state.team === 2 &&
+            (state.players > GAME_CONFIG.PLAYERS_PER_TEAM ||
+                (state.players === GAME_CONFIG.PLAYERS_PER_TEAM && state.balls > GAME_CONFIG.BALLS_PER_PLAYER))) {
             this.showResult();
             return;
         }
