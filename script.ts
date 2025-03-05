@@ -345,6 +345,7 @@ class CricketGame {
     private checkInningsProgress(): void {
         const state = this.stateManager.getState();
         
+        // Check if current player has completed their balls
         if (state.balls === 7) {
             this.stateManager.updateState({
                 players: state.players + 1,
@@ -353,16 +354,18 @@ class CricketGame {
             });
         }
         
-        // Check if team 2's innings is complete (all balls played)
-        if (state.team === 2 && state.players > GAME_CONFIG.PLAYERS_PER_TEAM) {
-            this.showResult();
+        // Check if team 1's innings is complete (all players done or last player finished balls)
+        if (state.team === 1 && 
+            (state.players > GAME_CONFIG.PLAYERS_PER_TEAM || 
+             (state.players === GAME_CONFIG.PLAYERS_PER_TEAM && state.balls > GAME_CONFIG.BALLS_PER_PLAYER))) {
+            GameUI.toggleTeamButton(1, false);
+            this.switchTeam();
             return;
         }
         
-        // Check if team 1's innings is complete
-        if (state.team === 1 && state.players > GAME_CONFIG.PLAYERS_PER_TEAM) {
-            GameUI.toggleTeamButton(1, false);
-            this.switchTeam();
+        // Check if team 2's innings is complete
+        if (state.team === 2 && state.players > GAME_CONFIG.PLAYERS_PER_TEAM) {
+            this.showResult();
             return;
         }
 
