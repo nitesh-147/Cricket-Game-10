@@ -213,6 +213,19 @@ class GameUI {
         const gameContainer = document.querySelector('.game-container');
         if (gameContainer) {
             gameContainer.appendChild(resultContainer);
+
+            // Enhanced smooth scrolling with better timing and positioning
+            setTimeout(() => {
+                // Calculate the result container's position relative to the viewport
+                const rect = resultContainer.getBoundingClientRect();
+                const absoluteTop = window.pageYOffset + rect.top;
+                const offset = 50; // Add some padding from the top
+
+                window.scrollTo({
+                    top: absoluteTop - offset,
+                    behavior: 'smooth'
+                });
+            }, 200); // Increased delay to ensure DOM is fully rendered
         }
 
         // Add event listener to restart button
