@@ -104,19 +104,19 @@ class GameUI {
     }
     static updateCell(id, value) {
         const cell = DOMHelper.getElement(id);
-        cell.innerText = value;
+        cell.textContent = value.toString().replace(/\./g, '');
         cell.classList.add('highlight');
         setTimeout(() => cell.classList.remove('highlight'), 500);
     }
     static updateScore(team, score) {
         const scoreElement = DOMHelper.getElement(`score${team}`);
-        scoreElement.innerText = score.toString();
+        scoreElement.textContent = score.toString().replace(/\./g, '');
         scoreElement.classList.add('highlight');
         setTimeout(() => scoreElement.classList.remove('highlight'), 500);
     }
     static updateTimer(time) {
         const timerElement = DOMHelper.getElement('timer');
-        timerElement.innerText = time.toString();
+        timerElement.textContent = time.toString();
         if (time <= 10) {
             timerElement.style.color = '#e74c3c';
         }
@@ -125,32 +125,49 @@ class GameUI {
         const button = DOMHelper.getElement(`hit${team}`);
         button.className = `hit-button${!enable ? ' disabled' : ''}`;
     }
-    static showGameResult(winner, margin, mom) {
+    static showGameResult(winner, resultText, mom) {
         var _a;
+        if (document.getElementById('result')) {
+            return;
+        }
         const resultContainer = DOMHelper.createElement('div', {
             class: 'result-container',
             id: 'result'
         });
         const winnerText = DOMHelper.createElement('h4', {
             class: 'mb-3'
-        }, `Team ${winner} wins by ${margin} runs!`);
+        }, resultText);
         const momText = DOMHelper.createElement('p', {
             class: 'mb-0'
         }, `Player of the Match: Player${mom.player} from Team${winner} (Score: ${mom.score})`);
         resultContainer.appendChild(winnerText);
         resultContainer.appendChild(momText);
         (_a = document.querySelector('.game-container')) === null || _a === void 0 ? void 0 : _a.appendChild(resultContainer);
+        this.toggleTeamButton(1, false);
+        this.toggleTeamButton(2, false);
+        const game = CricketGame.getInstance();
+        if (game) {
+            game.clearTimer();
+        }
     }
 }
 // Game Logic
 class CricketGame {
     constructor() {
+        this.gameEnded = false;
         this.stateManager = new GameStateManager();
         this.bindEvents();
+        CricketGame.instance = this;
+    }
+    static getInstance() {
+        return CricketGame.instance;
     }
     bindEvents() {
-        const hitBtn = DOMHelper.getElement('hit1');
-        hitBtn.addEventListener('click', () => this.handleHit());
+        // Bind events for both team buttons at initialization
+        const hitBtn1 = DOMHelper.getElement('hit1');
+        const hitBtn2 = DOMHelper.getElement('hit2');
+        hitBtn1.addEventListener('click', () => this.handleHit());
+        hitBtn2.addEventListener('click', () => this.handleHit());
     }
     handleHit() {
         const state = this.stateManager.getState();
@@ -187,6 +204,13 @@ class CricketGame {
                 teamTotal: newTeamTotal,
                 balls: state.balls + 1
             });
+            // Check if team 2 has won
+            if (state.team === 2) {
+                const score1 = parseInt(DOMHelper.getElement('score1').innerText);
+                if (newTeamTotal > score1) {
+                    this.showResult();
+                }
+            }
         }
     }
     checkInningsProgress() {
@@ -198,7 +222,7 @@ class CricketGame {
                 total: 0
             });
         }
-        if (state.players === 11) {
+        if (state.players > GAME_CONFIG.PLAYERS_PER_TEAM) {
             this.switchTeam();
         }
     }
@@ -209,20 +233,31 @@ class CricketGame {
         if (state.team === 1) {
             this.stateManager.nextTeam();
             GameUI.toggleTeamButton(2, true);
-            const hitBtn = DOMHelper.getElement('hit2');
-            hitBtn.addEventListener('click', () => this.handleHit());
         }
-        else {
+        else if (!this.gameEnded) {
             this.showResult();
         }
     }
     showResult() {
-        const score1 = parseInt(DOMHelper.getElement('score1').innerText);
-        const score2 = parseInt(DOMHelper.getElement('score2').innerText);
+        if (this.gameEnded)
+            return;
+        this.gameEnded = true;
+        this.clearTimer(); // Clear any existing timer
+        const score1 = parseInt(DOMHelper.getElement('score1').textContent || '0');
+        const score2 = parseInt(DOMHelper.getElement('score2').textContent || '0');
         const winner = score2 > score1 ? 2 : 1;
         const margin = Math.abs(score1 - score2);
         const mom = this.findPlayerOfTheMatch(winner);
-        GameUI.showGameResult(winner, margin, mom);
+        let resultText = '';
+        if (winner === 1) {
+            resultText = `Team ${winner} wins by ${margin} runs!`;
+        }
+        else {
+            const state = this.stateManager.getState();
+            const remainingWickets = GAME_CONFIG.PLAYERS_PER_TEAM - (state.players - 1);
+            resultText = `Team ${winner} wins by ${remainingWickets} wickets!`;
+        }
+        GameUI.showGameResult(winner, resultText, mom);
     }
     findPlayerOfTheMatch(winner) {
         let maxScore = 0;
@@ -241,6 +276,8 @@ class CricketGame {
         this.stateManager.setTimerInterval(interval);
     }
     updateTimer() {
+        if (this.gameEnded)
+            return;
         const timerElement = DOMHelper.getElement('timer');
         const currentTime = parseInt(timerElement.innerText) - 1;
         GameUI.updateTimer(currentTime);
@@ -256,7 +293,15 @@ class CricketGame {
         }
         GameUI.updateTimer(GAME_CONFIG.TIMER_DURATION);
     }
+    clearTimer() {
+        const interval = this.stateManager.getTimerInterval();
+        if (interval) {
+            clearInterval(interval);
+            this.stateManager.setTimerInterval(null);
+        }
+    }
 }
+CricketGame.instance = null;
 // Initialize the game when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     GameUI.initialize();

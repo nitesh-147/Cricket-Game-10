@@ -149,21 +149,21 @@ class GameUI {
 
     static updateCell(id: string, value: string): void {
         const cell = DOMHelper.getElement<HTMLTableCellElement>(id);
-        cell.innerText = value;
+        cell.textContent = value.toString().replace(/\./g, '');
         cell.classList.add('highlight');
         setTimeout(() => cell.classList.remove('highlight'), 500);
     }
 
     static updateScore(team: number, score: number): void {
         const scoreElement = DOMHelper.getElement<HTMLElement>(`score${team}`);
-        scoreElement.innerText = score.toString();
+        scoreElement.textContent = score.toString().replace(/\./g, '');
         scoreElement.classList.add('highlight');
         setTimeout(() => scoreElement.classList.remove('highlight'), 500);
     }
 
     static updateTimer(time: number): void {
         const timerElement = DOMHelper.getElement<HTMLElement>('timer');
-        timerElement.innerText = time.toString();
+        timerElement.textContent = time.toString();
         if (time <= 10) {
             timerElement.style.color = '#e74c3c';
         }
@@ -174,7 +174,11 @@ class GameUI {
         button.className = `hit-button${!enable ? ' disabled' : ''}`;
     }
 
-    static showGameResult(winner: number, margin: number, mom: { player: number; score: number }): void {
+    static showGameResult(winner: number, resultText: string, mom: { player: number; score: number }): void {
+        if (document.getElementById('result')) {
+            return;
+        }
+
         const resultContainer = DOMHelper.createElement('div', {
             class: 'result-container',
             id: 'result'
@@ -182,7 +186,7 @@ class GameUI {
         
         const winnerText = DOMHelper.createElement('h4', {
             class: 'mb-3'
-        }, `Team ${winner} wins by ${margin} runs!`);
+        }, resultText);
         
         const momText = DOMHelper.createElement('p', {
             class: 'mb-0'
@@ -191,21 +195,40 @@ class GameUI {
         resultContainer.appendChild(winnerText);
         resultContainer.appendChild(momText);
         document.querySelector('.game-container')?.appendChild(resultContainer);
+
+        this.toggleTeamButton(1, false);
+        this.toggleTeamButton(2, false);
+
+        const game = CricketGame.getInstance();
+        if (game) {
+            game.clearTimer();
+        }
     }
 }
 
 // Game Logic
 class CricketGame {
+    private static instance: CricketGame | null = null;
     private stateManager: GameStateManager;
+    private gameEnded: boolean = false;
 
     constructor() {
         this.stateManager = new GameStateManager();
         this.bindEvents();
+        CricketGame.instance = this;
+    }
+
+    static getInstance(): CricketGame | null {
+        return CricketGame.instance;
     }
 
     private bindEvents(): void {
-        const hitBtn = DOMHelper.getElement<HTMLButtonElement>('hit1');
-        hitBtn.addEventListener('click', () => this.handleHit());
+        // Bind events for both team buttons at initialization
+        const hitBtn1 = DOMHelper.getElement<HTMLButtonElement>('hit1');
+        const hitBtn2 = DOMHelper.getElement<HTMLButtonElement>('hit2');
+        
+        hitBtn1.addEventListener('click', () => this.handleHit());
+        hitBtn2.addEventListener('click', () => this.handleHit());
     }
 
     private handleHit(): void {
@@ -251,6 +274,14 @@ class CricketGame {
                 teamTotal: newTeamTotal,
                 balls: state.balls + 1
             });
+
+            // Check if team 2 has won
+            if (state.team === 2) {
+                const score1 = parseInt(DOMHelper.getElement<HTMLElement>('score1').innerText);
+                if (newTeamTotal > score1) {
+                    this.showResult();
+                }
+            }
         }
     }
 
@@ -265,7 +296,7 @@ class CricketGame {
             });
         }
         
-        if (state.players === 11) {
+        if (state.players > GAME_CONFIG.PLAYERS_PER_TEAM) {
             this.switchTeam();
         }
     }
@@ -279,22 +310,34 @@ class CricketGame {
         if (state.team === 1) {
             this.stateManager.nextTeam();
             GameUI.toggleTeamButton(2, true);
-            const hitBtn = DOMHelper.getElement<HTMLButtonElement>('hit2');
-            hitBtn.addEventListener('click', () => this.handleHit());
-        } else {
+        } else if (!this.gameEnded) {
             this.showResult();
         }
     }
 
     private showResult(): void {
-        const score1 = parseInt(DOMHelper.getElement<HTMLElement>('score1').innerText);
-        const score2 = parseInt(DOMHelper.getElement<HTMLElement>('score2').innerText);
+        if (this.gameEnded) return;
+        
+        this.gameEnded = true;
+        this.clearTimer();  // Clear any existing timer
+        
+        const score1 = parseInt(DOMHelper.getElement<HTMLElement>('score1').textContent || '0');
+        const score2 = parseInt(DOMHelper.getElement<HTMLElement>('score2').textContent || '0');
         
         const winner = score2 > score1 ? 2 : 1;
         const margin = Math.abs(score1 - score2);
         const mom = this.findPlayerOfTheMatch(winner);
+
+        let resultText = '';
+        if (winner === 1) {
+            resultText = `Team ${winner} wins by ${margin} runs!`;
+        } else {
+            const state = this.stateManager.getState();
+            const remainingWickets = GAME_CONFIG.PLAYERS_PER_TEAM - (state.players - 1);
+            resultText = `Team ${winner} wins by ${remainingWickets} wickets!`;
+        }
         
-        GameUI.showGameResult(winner, margin, mom);
+        GameUI.showGameResult(winner, resultText, mom);
     }
 
     private findPlayerOfTheMatch(winner: number): { player: number; score: number } {
@@ -318,6 +361,8 @@ class CricketGame {
     }
 
     private updateTimer(): void {
+        if (this.gameEnded) return;
+        
         const timerElement = DOMHelper.getElement<HTMLElement>('timer');
         const currentTime = parseInt(timerElement.innerText) - 1;
         
@@ -335,6 +380,14 @@ class CricketGame {
             this.stateManager.setTimerInterval(null);
         }
         GameUI.updateTimer(GAME_CONFIG.TIMER_DURATION);
+    }
+
+    clearTimer(): void {
+        const interval = this.stateManager.getTimerInterval();
+        if (interval) {
+            clearInterval(interval);
+            this.stateManager.setTimerInterval(null);
+        }
     }
 }
 
