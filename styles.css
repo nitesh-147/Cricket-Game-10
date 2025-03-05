@@ -22,18 +22,28 @@ body {
 .game-header {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
-    padding: 2rem;
+    padding: 1rem;
     border-radius: 15px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.game-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.game-header p {
+    font-size: 1rem;
+    margin-bottom: 0;
 }
 
 .score-board {
     background: white;
     border-radius: 15px;
-    padding: 2rem;
+    padding: 1rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .team-score {
@@ -48,16 +58,26 @@ body {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
+.team-score h5 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
 .timer-container {
     background: var(--primary-color);
     color: white;
     border-radius: 50%;
-    width: 120px;
-    height: 120px;
+    width: 100px;
+    height: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto;
+}
+
+.timer-container h2 {
+    font-size: 1.8rem;
+    margin: 0;
 }
 
 .hit-button {
@@ -147,9 +167,10 @@ body {
 }
 
 .score-value {
-    font-size: 3rem;
+    font-size: 2rem;
     font-weight: 700;
     color: var(--primary-color);
+    margin-bottom: 0.5rem;
 }
 
 .player-score {

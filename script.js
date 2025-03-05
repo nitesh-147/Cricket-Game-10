@@ -192,6 +192,11 @@ class CricketGame {
                 players: state.players + 1,
                 balls: 1
             });
+            // Check if all players of team 2 are out
+            if (state.team === 2 && state.players >= GAME_CONFIG.PLAYERS_PER_TEAM) {
+                this.showResult();
+                return;
+            }
         }
         else {
             const newTotal = state.total + run;
@@ -204,11 +209,12 @@ class CricketGame {
                 teamTotal: newTeamTotal,
                 balls: state.balls + 1
             });
-            // Check if team 2 has won
+            // Check if team 2 has won by exceeding team 1's score
             if (state.team === 2) {
-                const score1 = parseInt(DOMHelper.getElement('score1').innerText);
+                const score1 = parseInt(DOMHelper.getElement('score1').textContent || '0');
                 if (newTeamTotal > score1) {
                     this.showResult();
+                    return;
                 }
             }
         }
@@ -224,6 +230,14 @@ class CricketGame {
         }
         if (state.players > GAME_CONFIG.PLAYERS_PER_TEAM) {
             this.switchTeam();
+            return;
+        }
+        // Check if team 2 has won by exceeding team 1's score
+        if (state.team === 2) {
+            const score1 = parseInt(DOMHelper.getElement('score1').textContent || '0');
+            if (state.teamTotal > score1) {
+                this.showResult();
+            }
         }
     }
     switchTeam() {
@@ -233,6 +247,12 @@ class CricketGame {
         if (state.team === 1) {
             this.stateManager.nextTeam();
             GameUI.toggleTeamButton(2, true);
+            // Clear timer when switching to team 2
+            const interval = this.stateManager.getTimerInterval();
+            if (interval) {
+                clearInterval(interval);
+                this.stateManager.setTimerInterval(null);
+            }
         }
         else if (!this.gameEnded) {
             this.showResult();
