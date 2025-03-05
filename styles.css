@@ -1,0 +1,318 @@
+/* Modern Cricket Game UI Styles */
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --accent-color: #e74c3c;
+    --background-color: #ecf0f1;
+    --text-color: #2c3e50;
+}
+
+body {
+    background: var(--background-color);
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-color);
+}
+
+.game-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    overflow-x: hidden;
+}
+
+/* Center the row content */
+.row {
+    display: flex;
+    justify-content: center;
+    margin: 0 auto;
+    width: 100%;
+    gap: 2rem;
+}
+
+/* Adjust table containers */
+.col-md-5 {
+    flex: 0 0 auto;
+    width: calc(45% - 1rem);
+    min-width: 450px;
+}
+
+.col-md-2 {
+    flex: 0 0 auto;
+    width: 2%;
+}
+
+.game-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 1rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+.game-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.game-header p {
+    font-size: 1rem;
+    margin-bottom: 0;
+}
+
+.score-board {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+.score-board .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.score-board .col-md-4 {
+    flex: 1;
+    min-width: 200px;
+}
+
+.team-score {
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.team-score:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.team-score h5 {
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.score-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0;
+    line-height: 1;
+}
+
+.timer-container {
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.timer-container h2 {
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+.hit-button {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.hit-button:hover:not(.disabled) {
+    background: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+}
+
+.hit-button.disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
+}
+
+/* Make score table responsive */
+.score-table {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    margin: 0 auto;
+}
+
+.score-table table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+/* Adjust column widths */
+.score-table th:first-child {
+    width: 25%;
+}
+
+.score-table th:not(:first-child):not(:last-child) {
+    width: 9%;
+}
+
+.score-table th:last-child {
+    width: 22%;
+}
+
+.score-table th, .score-table td {
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+    white-space: nowrap;
+    overflow: visible;
+}
+
+.score-table td {
+    min-width: 40px;
+}
+
+.score-table td, .score-table th {
+    text-overflow: clip;
+    font-size: 0.95rem;
+}
+
+.score-table thead {
+    background: var(--primary-color);
+    color: white;
+}
+
+.score-table tbody tr:hover {
+    background: #f7f9fc;
+}
+
+.result-container {
+    background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+    color: white;
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    margin-top: 2rem;
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.player-score {
+    transition: all 0.3s ease;
+}
+
+.player-score.highlight {
+    background: #f1c40f;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+#restart-btn {
+    background: white;
+    color: var(--accent-color);
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 1rem;
+}
+
+#restart-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.3);
+    background: #f8f9fa;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .row {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .col-md-5 {
+        width: 100%;
+        max-width: 600px;
+        min-width: auto;
+    }
+
+    .col-md-2 {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .game-container {
+        padding: 1rem;
+    }
+    
+    .score-board {
+        padding: 1rem;
+    }
+    
+    .score-board .row {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 0.5rem;
+    }
+
+    .score-board .col-md-4 {
+        min-width: auto;
+    }
+
+    .team-score {
+        padding: 0.5rem;
+    }
+
+    .team-score h5 {
+        font-size: 0.9rem;
+    }
+
+    .score-value {
+        font-size: 1.5rem;
+    }
+
+    .timer-container {
+        width: 60px;
+        height: 60px;
+    }
+
+    .timer-container h2 {
+        font-size: 1.4rem;
+    }
+
+    .hit-button {
+        padding: 0.6rem 1.5rem;
+        font-size: 0.9rem;
+    }
+} 

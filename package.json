@@ -1,0 +1,13 @@
+{
+  "name": "fun-cricket",
+  "version": "1.0.0",
+  "description": "A fun cricket game implementation",
+  "main": "script.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+} 

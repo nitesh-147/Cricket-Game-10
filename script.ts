@@ -1,294 +1,541 @@
-//title container
-// document.getElementsByName('body')[0].style.border="2px solid blue";
-var titlecontainer = document.createElement("div");
-titlecontainer.setAttribute("id", "title");
-titlecontainer.setAttribute("class", "text-center mt-5");
-document.body.appendChild(titlecontainer);
-
-//title
-var title = document.createElement("h3");
-title.innerHTML = "CRICKET10";
-document.getElementById("title").appendChild(title);
-
-//colum container
-var row = document.createElement("div");
-row.setAttribute("class", "row mt-5");
-row.setAttribute("id", "row");
-document.body.appendChild(row);
-
-//three column
-var column1 = document.createElement("div");
-column1.setAttribute("class", "col-sm-4 text-center");
-column1.setAttribute("id", "column1");
-document.getElementById("row").appendChild(column1);
-
-var column2 = document.createElement("div");
-column2.setAttribute("class", "col-sm-4 text-center");
-column2.setAttribute("id", "column2");
-document.getElementById("row").appendChild(column2);
-
-var column3 = document.createElement("div");
-column3.setAttribute("class", "col-sm-4 text-center");
-column3.setAttribute("id", "column3");
-document.getElementById("row").append(column3);
-
-//column1 items
-var titlescrore1 = document.createElement("h5");
-titlescrore1.innerHTML = "Team Score 1";
-document.getElementById("column1").appendChild(titlescrore1);
-
-var scrore1 = document.createElement("h2");
-scrore1.innerHTML = "0";
-scrore1.setAttribute("id", "score1");
-document.getElementById("column1").appendChild(scrore1);
-
-var button1 = document.createElement("button");
-button1.setAttribute("class", "btn btn-primary");
-button1.setAttribute("id", "hit1");
-// button1.setAttribute("onclick", game.displayRuns);
-button1.innerHTML = "HIT 1";
-document.getElementById("column1").appendChild(button1);
-
-//column2 items
-var timerTitle = document.createElement("h5");
-timerTitle.innerHTML = "TIMER";
-document.getElementById("column2").appendChild(timerTitle);
-
-//clock
-var timer = document.createElement("h2");
-timer.innerHTML = "60";
-timer.setAttribute("id", "timer");
-document.getElementById("column2").appendChild(timer);
-
-//column3 items
-var titlescrore2 = document.createElement("h5");
-titlescrore2.innerHTML = "Team Score 2";
-document.getElementById("column3").appendChild(titlescrore2);
-
-var scrore2 = document.createElement("h2");
-scrore2.innerHTML = "0";
-scrore2.setAttribute("id", "score2");
-document.getElementById("column3").appendChild(scrore2);
-
-var button2 = document.createElement("button");
-button2.setAttribute("class", "btn btn-primary disabled");
-button2.setAttribute("id", "hit2");
-button2.innerHTML = "HIT 2";
-document.getElementById("column3").appendChild(button2);
-
-var row_table = document.createElement("div");
-row_table.setAttribute("class", "row mt-5");
-row_table.setAttribute("id", "row_table");
-document.body.appendChild(row_table);
-
-//three column
-var table_column1 = document.createElement("div");
-table_column1.setAttribute("class", "col-sm-5 text-center");
-table_column1.setAttribute("id", "table_column1");
-document.getElementById("row_table").appendChild(table_column1);
-
-var table_column2 = document.createElement("div");
-table_column2.setAttribute("class", "col-sm-2 text-center");
-table_column2.setAttribute("id", "table_column2");
-document.getElementById("row_table").appendChild(table_column2);
-
-var table_column3 = document.createElement("div");
-table_column3.setAttribute("class", "col-sm-5 text-center");
-table_column3.setAttribute("id", "table_column3");
-document.getElementById("row_table").append(table_column3);
-
-//table 1
-var table1 = document.createElement("table");
-table1.setAttribute("class", "table table-bordered");
-table1.setAttribute("id", "table1");
-document.getElementById("table_column1").appendChild(table1);
-
-// thead 1
-var thead1 = document.createElement("thead");
-thead1.innerHTML =
-    "<tr><th>Team 1</th><th>B1</th><th>B2</th><th>B3</th><th>B4</th><th>B5</th><th>B6</th><th>Total</th></tr>";
-document.getElementById("table1").appendChild(thead1);
-
-var tbody1 = document.createElement("tbody");
-document.getElementById("table1").appendChild(tbody1);
-
-for (var i = 1; i <= 10; i++) {
-    var temptr = document.createElement("tr");
-    var temp_player = document.createElement("th");
-    temp_player.innerHTML = "Player" + i;
-    temptr.appendChild(temp_player);
-    for (var j = 1; j < 7; j++) {
-        var temp_td = document.createElement("td");
-        var idx = "1" + i + j;
-        temp_td.setAttribute("id", idx);
-        temptr.appendChild(temp_td);
-    }
-    var tot_td = document.createElement("td");
-    tot_td.setAttribute("id", "t1" + i);
-    temptr.appendChild(tot_td);
-    tbody1.append(temptr);
+// Game Configuration
+interface GameConfig {
+    readonly PLAYERS_PER_TEAM: number;
+    readonly BALLS_PER_PLAYER: number;
+    readonly TIMER_DURATION: number;
+    readonly TEAMS: number;
 }
 
-var table2 = document.createElement("table");
-table2.setAttribute("class", "table table-bordered");
-table2.setAttribute("id", "table2");
-document.getElementById("table_column3").appendChild(table2);
+const GAME_CONFIG: GameConfig = {
+    PLAYERS_PER_TEAM: 10,
+    BALLS_PER_PLAYER: 6,
+    TIMER_DURATION: 20,
+    TEAMS: 2
+};
 
-// thead 1
-var thead2 = document.createElement("thead");
-thead2.innerHTML =
-    "<tr><th>Team 2</th><th>B1</th><th>B2</th><th>B3</th><th>B4</th><th>B5</th><th>B6</th><th>Total</th></tr>";
-document.getElementById("table2").appendChild(thead2);
-
-var tbody2 = document.createElement("tbody");
-document.getElementById("table2").appendChild(tbody2);
-
-for (var i = 1; i <= 10; i++) {
-    var temptr = document.createElement("tr");
-    var temp_player = document.createElement("th");
-    temp_player.innerHTML = "Player" + i;
-    temptr.appendChild(temp_player);
-    for (var j = 1; j < 7; j++) {
-        var temp_td = document.createElement("td");
-        var idx = "2" + i + j;
-        temp_td.setAttribute("id", idx);
-        temptr.appendChild(temp_td);
-    }
-    var tot_td = document.createElement("td");
-    tot_td.setAttribute("id", "t2" + i);
-    temptr.appendChild(tot_td);
-    tbody2.append(temptr);
+// DOM Helper Types
+interface ElementAttributes {
+    id?: string;
+    class?: string;
+    [key: string]: string | undefined;
 }
 
-class Game {
-    //VARIABLES DECALRED FOR DISPLAYING RUNS AND FOR SUM OF THEM
-    players: any = 1;
-    balls: any = 1;
-    total: any = 0;
-    teamTotal: any = 0;
-    team: any = 1;
-    //VARIABLE DECALRED TO TOGGLE BETWEEN TWO CONDITIONS
-    tInterval: any;
+// DOM Manipulation Helper
+class DOMHelper {
+    static createElement<K extends keyof HTMLElementTagNameMap>(
+        type: K,
+        attributes: ElementAttributes = {},
+        innerHTML: string = ''
+    ): HTMLElementTagNameMap[K] {
+        const element = document.createElement(type);
+        Object.entries(attributes).forEach(([key, value]) => {
+            if (value) element.setAttribute(key, value);
+        });
+        if (innerHTML) element.innerHTML = innerHTML;
+        return element;
+    }
 
-    randomRunGenerator = () => {
-        let run = Math.floor(Math.random() * 7);
-        return run;
-    };
+    static getElement<T extends HTMLElement>(id: string): T {
+        const element = document.getElementById(id) as T;
+        if (!element) {
+            throw new Error(`Element with id '${id}' not found`);
+        }
+        return element;
+    }
 
+    static appendToParent(parentId: string, element: HTMLElement): void {
+        const parent = this.getElement(parentId);
+        parent.appendChild(element);
+    }
+}
 
-    displayRuns = () => {
-        //IF CONDITION FOR 1P PLAYERS
-        if (this.players === 1 && this.balls === 1) {
+// Game State Management
+interface GameState {
+    players: number;
+    balls: number;
+    total: number;
+    teamTotal: number;
+    team: number;
+    tInterval: number | null;
+    wickets: number;
+}
+
+class GameStateManager {
+    private state: GameState;
+
+    constructor() {
+        this.state = {
+            players: 1,
+            balls: 1,
+            total: 0,
+            teamTotal: 0,
+            team: 1,
+            tInterval: null,
+            wickets: 0
+        };
+    }
+
+    getState(): Readonly<GameState> {
+        return { ...this.state };
+    }
+
+    updateState(updates: Partial<GameState>): void {
+        this.state = { ...this.state, ...updates };
+    }
+
+    resetInningsState(): void {
+        this.updateState({
+            players: 1,
+            balls: 1,
+            total: 0,
+            teamTotal: 0,
+            wickets: 0
+        });
+    }
+
+    nextTeam(): void {
+        this.updateState({
+            team: this.state.team + 1,
+            players: 1,
+            balls: 1,
+            total: 0,
+            teamTotal: 0,
+            wickets: 0
+        });
+    }
+
+    setTimerInterval(interval: number | null): void {
+        this.state.tInterval = interval;
+    }
+
+    getTimerInterval(): number | null {
+        return this.state.tInterval;
+    }
+}
+
+// UI Components
+class GameUI {
+    static initialize(): void {
+        // Initialize event listeners and any dynamic content
+        this.initializeScoreTables();
+        // Initialize timer with config value
+        this.updateTimer(GAME_CONFIG.TIMER_DURATION);
+    }
+
+    private static initializeScoreTables(): void {
+        // Initialize the score tables with empty rows
+        for (let teamNum = 1; teamNum <= 2; teamNum++) {
+            const tbody = document.querySelector(`#table${teamNum} tbody`);
+            if (tbody) {
+                for (let i = 1; i <= GAME_CONFIG.PLAYERS_PER_TEAM; i++) {
+                    const row = this.createPlayerRow(teamNum, i);
+                    tbody.appendChild(row);
+                }
+            }
+        }
+    }
+
+    private static createPlayerRow(teamNum: number, playerNum: number): HTMLTableRowElement {
+        const row = DOMHelper.createElement('tr');
+        row.appendChild(DOMHelper.createElement('th', {}, `Player${playerNum}`));
+
+        for (let j = 1; j <= GAME_CONFIG.BALLS_PER_PLAYER; j++) {
+            const cell = DOMHelper.createElement('td', {
+                id: `${teamNum}${playerNum}${j}`
+            });
+            row.appendChild(cell);
+        }
+
+        row.appendChild(DOMHelper.createElement('td', {
+            id: `t${teamNum}${playerNum}`
+        }));
+
+        return row;
+    }
+
+    static updateCell(id: string, value: string): void {
+        const cell = DOMHelper.getElement<HTMLTableCellElement>(id);
+        cell.textContent = value.toString().replace(/\./g, '');
+        cell.classList.add('highlight');
+        setTimeout(() => cell.classList.remove('highlight'), 500);
+    }
+
+    static updateScore(team: number, score: number, wickets: number): void {
+        const scoreElement = DOMHelper.getElement<HTMLElement>(`score${team}`);
+        scoreElement.textContent = `${score.toString().replace(/\./g, '')}/${wickets}`;
+        scoreElement.classList.add('highlight');
+        setTimeout(() => scoreElement.classList.remove('highlight'), 500);
+    }
+
+    static updateTimer(time: number): void {
+        const timerElement = DOMHelper.getElement<HTMLElement>('timer');
+        timerElement.textContent = time.toString();
+        if (time <= 10) {
+            timerElement.style.color = '#e74c3c';
+        }
+    }
+
+    static toggleTeamButton(team: number, enable: boolean): void {
+        const button = DOMHelper.getElement<HTMLButtonElement>(`hit${team}`);
+        button.className = `hit-button${!enable ? ' disabled' : ''}`;
+        button.disabled = !enable;
+    }
+
+    static showGameResult(winner: number, resultText: string, mom: { player: number; score: number }): void {
+        // Remove any existing result container
+        const existingResult = document.getElementById('result');
+        if (existingResult) {
+            existingResult.remove();
+        }
+
+        const resultContainer = DOMHelper.createElement('div', {
+            class: 'result-container',
+            id: 'result'
+        });
+
+        const winnerText = DOMHelper.createElement('h4', {
+            class: 'mb-3'
+        }, resultText);
+
+        const momText = DOMHelper.createElement('p', {
+            class: 'mb-3'
+        }, `Player of the Match: Player${mom.player} from Team${winner} (Score: ${mom.score})`);
+
+        const restartButton = DOMHelper.createElement('button', {
+            class: 'hit-button',
+            id: 'restart-btn'
+        }, 'Restart Game');
+
+        resultContainer.appendChild(winnerText);
+        resultContainer.appendChild(momText);
+        resultContainer.appendChild(restartButton);
+
+        const gameContainer = document.querySelector('.game-container');
+        if (gameContainer) {
+            gameContainer.appendChild(resultContainer);
+
+            // Enhanced smooth scrolling with better timing and positioning
+            setTimeout(() => {
+                // Calculate the result container's position relative to the viewport
+                const rect = resultContainer.getBoundingClientRect();
+                const absoluteTop = window.pageYOffset + rect.top;
+                const offset = 50; // Add some padding from the top
+
+                window.scrollTo({
+                    top: absoluteTop - offset,
+                    behavior: 'smooth'
+                });
+            }, 200); // Increased delay to ensure DOM is fully rendered
+        }
+
+        // Add event listener to restart button
+        restartButton.addEventListener('click', () => {
+            CricketGame.getInstance()?.restartGame();
+        });
+    }
+
+    static resetUI(): void {
+        // Reset score displays
+        this.updateScore(1, 0, 0);
+        this.updateScore(2, 0, 0);
+
+        // Reset timer
+        this.updateTimer(GAME_CONFIG.TIMER_DURATION);
+        DOMHelper.getElement<HTMLElement>('timer').style.color = '';
+
+        // Reset buttons
+        this.toggleTeamButton(1, true);
+        this.toggleTeamButton(2, false);
+
+        // Clear all cells
+        for (let team = 1; team <= 2; team++) {
+            for (let player = 1; player <= GAME_CONFIG.PLAYERS_PER_TEAM; player++) {
+                // Clear player total
+                this.updateCell(`t${team}${player}`, '');
+                // Clear each ball
+                for (let ball = 1; ball <= GAME_CONFIG.BALLS_PER_PLAYER; ball++) {
+                    this.updateCell(`${team}${player}${ball}`, '');
+                }
+            }
+        }
+
+        // Remove result container if exists
+        const resultContainer = document.getElementById('result');
+        if (resultContainer) {
+            resultContainer.remove();
+        }
+    }
+}
+
+// Game Logic
+class CricketGame {
+    private static instance: CricketGame | null = null;
+    private stateManager: GameStateManager;
+    private gameEnded: boolean = false;
+
+    constructor() {
+        this.stateManager = new GameStateManager();
+        this.bindEvents();
+        CricketGame.instance = this;
+    }
+
+    static getInstance(): CricketGame | null {
+        return CricketGame.instance;
+    }
+
+    private bindEvents(): void {
+        // Bind events for both team buttons at initialization
+        const hitBtn1 = DOMHelper.getElement<HTMLButtonElement>('hit1');
+        const hitBtn2 = DOMHelper.getElement<HTMLButtonElement>('hit2');
+
+        hitBtn1.addEventListener('click', () => {
+            if (!hitBtn1.classList.contains('disabled')) {
+                this.handleHit();
+            }
+        });
+        hitBtn2.addEventListener('click', () => {
+            if (!hitBtn2.classList.contains('disabled')) {
+                this.handleHit();
+            }
+        });
+    }
+
+    private handleHit(): void {
+        const state = this.stateManager.getState();
+
+        if (state.players === 1 && state.balls === 1) {
             this.startTimer();
         }
-        let run = this.randomRunGenerator();
-        var current_td_id = "" + this.team + this.players + this.balls;
-        var current_td = document.getElementById(current_td_id);
+
+        const run = this.generateRun();
+        const cellId = `${state.team}${state.players}${state.balls}`;
+
+        this.updateScore(run, cellId);
+        this.checkInningsProgress();
+    }
+
+    private generateRun(): number {
+        return Math.floor(Math.random() * 7);
+    }
+
+    private updateScore(run: number, cellId: string): void {
+        const state = this.stateManager.getState();
+
         if (run === 0) {
-            current_td.innerText = "W";
-            var t_id = "t" + this.team + this.players;
-            document.getElementById(t_id).innerText = "" + this.total;
-            this.total = 0;
-            this.players++;
-            this.balls = 1;
-        } else {
-            this.total += run;
-            this.teamTotal += run;
-            current_td.innerText = "" + run;
-            this.balls++;
-            var t_id = "t" + this.team + this.players;
-            document.getElementById(t_id).innerText = "" + this.total;
-        }
-        document.getElementById("score" + this.team).innerText = this.teamTotal;
-        if (this.balls == 7) {
-            this.players++;
-            this.balls = 1;
-            this.total = 0;
-        }
-        if (this.players === 11) {
-            this.updateTeam();
-        }
-    };
+            GameUI.updateCell(cellId, 'W');
+            GameUI.updateCell(`t${state.team}${state.players}`, state.total.toString());
 
-    updateTeam = () => {
+            // Update state with new wicket
+            const newWickets = state.wickets + 1;
+            this.stateManager.updateState({
+                total: 0,
+                players: state.players + 1,
+                balls: 1,
+                wickets: newWickets
+            });
+
+            // Update score display with wickets
+            GameUI.updateScore(state.team, state.teamTotal, newWickets);
+
+            // Check if all players of team 2 are out or last player finished
+            if (state.team === 2 &&
+                (state.players >= GAME_CONFIG.PLAYERS_PER_TEAM ||
+                    (state.players === GAME_CONFIG.PLAYERS_PER_TEAM && state.balls >= GAME_CONFIG.BALLS_PER_PLAYER))) {
+                this.showResult();
+                return;
+            }
+        } else {
+            const newTotal = state.total + run;
+            const newTeamTotal = state.teamTotal + run;
+
+            GameUI.updateCell(cellId, run.toString());
+            GameUI.updateCell(`t${state.team}${state.players}`, newTotal.toString());
+            GameUI.updateScore(state.team, newTeamTotal, state.wickets);
+
+            this.stateManager.updateState({
+                total: newTotal,
+                teamTotal: newTeamTotal,
+                balls: state.balls + 1
+            });
+
+            // Check if player has completed their 6 balls
+            if (state.balls === GAME_CONFIG.BALLS_PER_PLAYER) {
+                // Move to next player and count wicket
+                const newWickets = state.wickets + 1;
+                this.stateManager.updateState({
+                    players: state.players + 1,
+                    balls: 1,
+                    total: 0,
+                    wickets: newWickets
+                });
+                // Update score display with new wicket count
+                GameUI.updateScore(state.team, newTeamTotal, newWickets);
+            }
+
+            // Check if team 2 has won by exceeding team 1's score
+            if (state.team === 2) {
+                const score1 = parseInt(DOMHelper.getElement<HTMLElement>('score1').textContent?.split('/')[0] || '0');
+                if (newTeamTotal > score1) {
+                    this.showResult();
+                    return;
+                }
+            }
+        }
+    }
+
+    private checkInningsProgress(): void {
+        const state = this.stateManager.getState();
+
+        // Check if current player has completed their balls
+        if (state.balls === 7) {
+            // Move to next player without counting wicket (wicket already counted in updateScore)
+            this.stateManager.updateState({
+                players: state.players + 1,
+                balls: 1,
+                total: 0
+            });
+        }
+
+        // Check if team 1's innings is complete (all players done or last player finished balls)
+        if (state.team === 1 &&
+            (state.players > GAME_CONFIG.PLAYERS_PER_TEAM ||
+                (state.players === GAME_CONFIG.PLAYERS_PER_TEAM && state.balls > GAME_CONFIG.BALLS_PER_PLAYER))) {
+            GameUI.toggleTeamButton(1, false);
+            this.switchTeam();
+            return;
+        }
+
+        // Check if team 2's innings is complete (all players done or last player finished balls)
+        if (state.team === 2 &&
+            (state.players > GAME_CONFIG.PLAYERS_PER_TEAM ||
+                (state.players === GAME_CONFIG.PLAYERS_PER_TEAM && state.balls > GAME_CONFIG.BALLS_PER_PLAYER))) {
+            this.showResult();
+            return;
+        }
+
+        // Check if team 2 has won by exceeding team 1's score
+        if (state.team === 2) {
+            const score1 = parseInt(DOMHelper.getElement<HTMLElement>('score1').textContent?.split('/')[0] || '0');
+            if (state.teamTotal > score1) {
+                this.showResult();
+                return;
+            }
+        }
+    }
+
+    private switchTeam(): void {
+        const state = this.stateManager.getState();
+
         this.resetTimer();
-        var hitBtn = document.getElementById("hit" + this.team);
-        hitBtn.setAttribute("class", "btn btn-primary disabled");
-        hitBtn?.removeEventListener("click", this.displayRuns);
-        this.team = this.team + 1;
-        if (this.team === 2) {
-            document.getElementById("hit" + this.team)?.setAttribute("class", "btn btn-primary");
-            document.getElementById("hit" + this.team)?.addEventListener("click", this.displayRuns);
+        GameUI.toggleTeamButton(state.team, false);
+
+        if (state.team === 1) {
+            this.stateManager.nextTeam();
+            GameUI.toggleTeamButton(1, false);
+            GameUI.toggleTeamButton(2, true);
+            // Don't clear timer for team 2, let it start when they begin
+        } else if (!this.gameEnded) {
+            this.showResult();
+        }
+    }
+
+    private showResult(): void {
+        if (this.gameEnded) return;
+
+        this.gameEnded = true;
+        this.clearTimer();  // Clear any existing timer
+
+        const score1 = parseInt(DOMHelper.getElement<HTMLElement>('score1').textContent?.split('/')[0] || '0');
+        const score2 = parseInt(DOMHelper.getElement<HTMLElement>('score2').textContent?.split('/')[0] || '0');
+
+        const winner = score2 > score1 ? 2 : 1;
+        const margin = Math.abs(score1 - score2);
+        const mom = this.findPlayerOfTheMatch(winner);
+
+        let resultText = '';
+        if (winner === 1) {
+            resultText = `Team ${winner} wins by ${margin} runs!`;
         } else {
-            this.showGenerateResultButton();
+            const state = this.stateManager.getState();
+            const remainingWickets = GAME_CONFIG.PLAYERS_PER_TEAM - state.wickets;
+            resultText = `Team ${winner} wins by ${remainingWickets} wickets!`;
         }
-        this.players = 1;
-        this.balls = 1;
-        this.total = 0;
-        this.teamTotal = 0;
-    };
 
-    showGenerateResultButton = () => {
-        var gen_res = document.createElement('button');
-        gen_res.innerHTML = "Generate Result";
-        gen_res.setAttribute("id", "generate_result");
-        gen_res.setAttribute("class", "btn btn-primary");
-        gen_res.addEventListener("click", this.displayResult);
-        table_column2.appendChild(gen_res);
-        var p_win = document.createElement('h4');
-        p_win.setAttribute("id", "winner");
-        table_column2.appendChild(p_win);
-        var p_mom = document.createElement('p');
-        p_mom.setAttribute("id", "mom");
-        table_column2.appendChild(p_mom);
-    };
+        // Ensure both buttons are disabled
+        GameUI.toggleTeamButton(1, false);
+        GameUI.toggleTeamButton(2, false);
 
-    displayResult = () => {
-        var x = parseInt(document.getElementById('score1').innerText);
-        var y = parseInt(document.getElementById('score2').innerText);
-        var winner = 1;
-        var margin = Math.abs(x - y);
-        if (y > x) {
-            winner = 2;
-        }
-        var message = `Team ${winner} wins by ${margin} runs`;
-        document.getElementById('winner').innerText = message;
+        // Add a small delay to ensure DOM updates are complete
+        setTimeout(() => {
+            GameUI.showGameResult(winner, resultText, mom);
+        }, 100);
+    }
 
-        var max_score = 0;
-        var player = -1;
+    private findPlayerOfTheMatch(winner: number): { player: number; score: number } {
+        let maxScore = 0;
+        let player = -1;
 
-        for (var i = 1; i <= 10; i++) {
-            var temp = parseInt(document.getElementById('t' + winner + i).innerText);
-            if (temp >= max_score) {
-                max_score = temp;
+        for (let i = 1; i <= GAME_CONFIG.PLAYERS_PER_TEAM; i++) {
+            const score = parseInt(DOMHelper.getElement<HTMLElement>(`t${winner}${i}`).textContent || '0');
+            if (score >= maxScore) {
+                maxScore = score;
                 player = i;
             }
         }
-        var mom_message = `Player of the Match: Player${player} from Team${winner} Score:${max_score}`;
-        document.getElementById('mom').innerText = mom_message;
 
-    };
+        return { player, score: maxScore };
+    }
 
-    startTimer = () => {
-        this.tInterval = setInterval(this.displayTime, 1000);
-    };
+    private startTimer(): void {
+        const interval = window.setInterval(() => this.updateTimer(), 1000);
+        this.stateManager.setTimerInterval(interval);
+    }
 
-    displayTime = () => {
-        var x = document.getElementById('timer');
-        var y = parseInt(x.innerHTML);
-        y--;
-        x.innerText = "" + y;
-        if (y === 0) {
-            this.updateTeam();
+    private updateTimer(): void {
+        if (this.gameEnded) return;
+
+        const timerElement = DOMHelper.getElement<HTMLElement>('timer');
+        const currentTime = parseInt(timerElement.innerText) - 1;
+
+        GameUI.updateTimer(currentTime);
+
+        if (currentTime === 0) {
+            this.switchTeam();
         }
-    };
+    }
 
-    resetTimer = () => {
-        var x = document.getElementById('timer');
-        x.innerHTML = "60";
-        clearInterval(this.tInterval);
-    };
+    private resetTimer(): void {
+        const interval = this.stateManager.getTimerInterval();
+        if (interval) {
+            clearInterval(interval);
+            this.stateManager.setTimerInterval(null);
+        }
+        GameUI.updateTimer(GAME_CONFIG.TIMER_DURATION);
+    }
+
+    clearTimer(): void {
+        const interval = this.stateManager.getTimerInterval();
+        if (interval) {
+            clearInterval(interval);
+            this.stateManager.setTimerInterval(null);
+        }
+    }
+
+    restartGame(): void {
+        // Reset game state
+        this.gameEnded = false;
+        this.clearTimer();
+
+        // Reset state manager
+        this.stateManager = new GameStateManager();
+
+        // Reset UI
+        GameUI.resetUI();
+    }
 }
 
-var game = new Game();
-document.getElementById('hit1').addEventListener("click", game.displayRuns);
+// Initialize the game when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    GameUI.initialize();
+    new CricketGame();
+});
